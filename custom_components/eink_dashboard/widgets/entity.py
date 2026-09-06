@@ -38,6 +38,7 @@ from ._helpers import (
     _metrics_context,
     _resolve_icon_style,
     _resolve_icon_svg,
+    _text_color_hex,
     _widget_dim,
 )
 
@@ -281,6 +282,9 @@ def _build_entity_context(
         "card_style": card_style,
         "bar_width": bar_width,
         "invert": invert,
+        # Optional shade override for name/value/unit text; empty
+        # string means "use the per-element default colors".
+        "text_color": _text_color_hex(widget),
         **_metrics_context(m),
         **colors,
         # Icon geometry.

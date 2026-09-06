@@ -87,6 +87,38 @@ class TestRenderTile:
     def _config(self, **overrides: object) -> dict[str, object]:
         return make_config(self._DEFAULTS, **overrides)
 
+    def test_tile_text_color_colors_name_and_value(self) -> None:
+        # text_color overrides the fill of the name (primary) and
+        # state value (secondary) text with the chosen grayscale
+        # shade (light gray = 180 → "#b4b4b4").
+        widget = {
+            "type": "tile",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entity": "sensor.temperature",
+            "text_color": 180,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('fill="#b4b4b4"') >= 2, (
+            "name and value text should both use the chosen shade"
+        )
+
+    def test_tile_without_text_color_keeps_default_colors(self) -> None:
+        # Without text_color, the value stays black and the name gray.
+        widget = {
+            "type": "tile",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entity": "sensor.temperature",
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'fill="#000000"' in svg, "value should stay black"
+        assert 'fill="#787878"' in svg, "name should stay gray"
+
     # ── Structural tests ──────────────────────────────
 
     def test_tile_card_border(self) -> None:

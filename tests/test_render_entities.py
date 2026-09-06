@@ -95,6 +95,39 @@ class TestRenderEntities:
     def _config(self, **overrides: object) -> dict[str, object]:
         return make_config(self._DEFAULTS, **overrides)
 
+    def test_entities_text_color_colors_row_name_and_value(self) -> None:
+        # text_color overrides the fill of each row's name and value
+        # text with the chosen grayscale shade (light gray = 180 →
+        # "#b4b4b4"). A single row emits both, so at least two fills
+        # must pick up the shade.
+        widget = {
+            "type": "entities",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entities": ["sensor.temperature"],
+            "text_color": 180,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('fill="#b4b4b4"') >= 2, (
+            "row name and value should both use the chosen shade"
+        )
+
+    def test_entities_without_text_color_keeps_default_colors(self) -> None:
+        # Without text_color, the value stays black and the name gray.
+        widget = {
+            "type": "entities",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entities": ["sensor.temperature"],
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'fill="#000000"' in svg, "value should stay black"
+        assert 'fill="#787878"' in svg, "name should stay gray"
+
     # ── Structural tests ──────────────────────────────
 
     def test_entities_card_border(self) -> None:

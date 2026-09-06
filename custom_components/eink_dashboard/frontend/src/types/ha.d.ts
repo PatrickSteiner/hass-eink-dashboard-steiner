@@ -529,6 +529,12 @@ export interface TileWidget extends WidgetBase {
   /** When true, renders the secondary state line in bold. */
   bold_value?: boolean;
   /**
+   * Grayscale shade (0–255) applied to the name and state value
+   * text at once. Omitted (or empty) keeps each element's default
+   * color — name gray, value black.
+   */
+  text_color?: number;
+  /**
    * HA conditions that trigger inverted rendering (black card,
    * white text) as an e-ink attention signal. Same condition
    * format as `visibility`. The tile renders inverted when the
@@ -661,6 +667,12 @@ export interface EntitiesWidget extends WidgetBase {
   icon_style?: IconStyle;
   /** When true, renders each row's state value in bold. */
   bold_value?: boolean;
+  /**
+   * Grayscale shade (0–255) applied to each row's name and value
+   * text at once. Omitted (or empty) keeps the defaults — name
+   * gray, value black.
+   */
+  text_color?: number;
 }
 
 /**
@@ -698,6 +710,12 @@ export interface EntityWidget extends WidgetBase {
   icon_style?: IconStyle;
   /** When true, renders the state value in bold. */
   bold_value?: boolean;
+  /**
+   * Grayscale shade (0–255) applied to the name, value, and unit
+   * text at once. Omitted (or empty) keeps each element's default
+   * color — name gray, value black.
+   */
+  text_color?: number;
   /**
    * Position of the name relative to the value+unit line.
    * Defaults to `"bottom"`.
@@ -788,6 +806,12 @@ export interface SensorWidget extends WidgetBase {
   icon_style?: IconStyle;
   /** When true, renders the state value in bold. */
   bold_value?: boolean;
+  /**
+   * Grayscale shade (0–255) applied to the name, value, and unit
+   * text at once. Omitted (or empty) keeps each element's default
+   * color — name gray, value black.
+   */
+  text_color?: number;
 }
 
 /** One threshold-based color band on the gauge track. */
@@ -873,6 +897,12 @@ export interface GaugeWidget extends WidgetBase {
    * medium weight.
    */
   bold_value?: boolean;
+  /**
+   * Grayscale shade (0–255) applied to the name, value, and unit
+   * text at once. Omitted (or empty) keeps each element's default
+   * color — name gray, value black.
+   */
+  text_color?: number;
 }
 
 /**
@@ -1211,6 +1241,12 @@ export interface GraphWidget extends WidgetBase {
   threshold_4_shade?: "black" | "dark" | "medium" | "light";
   /** When true, renders the header value text in bold. */
   bold_value?: boolean;
+  /**
+   * Grayscale shade (0–255) applied to the header name, value, and
+   * unit text at once. Omitted (or empty) keeps each element's
+   * default color — name gray, value black.
+   */
+  text_color?: number;
 }
 
 export type Widget =

@@ -130,6 +130,32 @@ def _color_context() -> dict[str, str]:
     }
 
 
+def _text_color_hex(widget: Widget) -> str:
+    """Return the widget's ``text_color`` as an SVG hex string, or ``""``.
+
+    Reads the optional ``text_color`` widget option — a grayscale
+    0–255 value that overrides the fill of an entity-name widget's
+    name, value, and unit text.  Returns an empty string when the
+    option is absent, empty, or not a valid integer, so templates
+    fall back to their per-element default colors via the Jinja2
+    idiom ``{{ text_color or hex_gray }}``.
+
+    Args:
+        widget: Widget config dict.  Only ``text_color`` is read.
+
+    Returns:
+        SVG hex color string (e.g. ``"#b4b4b4"``) when a valid
+        ``text_color`` is set, otherwise ``""``.
+    """
+    raw = widget.get("text_color")
+    if raw is None or raw == "":
+        return ""
+    try:
+        return color_to_hex(int(raw))
+    except (ValueError, TypeError):
+        return ""
+
+
 def _fmt(value: str, config: DisplayConfig) -> str:
     """Format a numeric string using the locale settings in ``config``.
 
@@ -635,6 +661,9 @@ def _entity_info_context(
         "has_entity": True,
         "card_style": card_style,
         "bar_width": bar_width,
+        # Optional shade override for name/value/unit text; empty
+        # string means "use the per-element default colors".
+        "text_color": _text_color_hex(widget),
         **_metrics_context(m),
         **colors,
         # Icon geometry.

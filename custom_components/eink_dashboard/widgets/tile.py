@@ -34,6 +34,7 @@ from ._helpers import (
     _metrics_context,
     _resolve_icon_style,
     _resolve_icon_svg,
+    _text_color_hex,
     _widget_dim,
 )
 
@@ -225,6 +226,9 @@ def _build_tile_context(
         "icon_stroke_w": icon_stroke_w,
         "letter": letter,
         "invert": invert,
+        # Optional shade override for name/value text; empty string
+        # means "use the per-element default colors".
+        "text_color": _text_color_hex(widget),
     }
     # When icon is hidden, collapse the icon column so text starts
     # at the left edge.
