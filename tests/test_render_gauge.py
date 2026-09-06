@@ -109,6 +109,23 @@ class TestRenderGauge:
         w.update(overrides)
         return w
 
+    def test_gauge_text_color_colors_name_value_unit(self) -> None:
+        # text_color overrides the fill of the name, value, and unit
+        # text with the chosen grayscale shade (light gray = 180 →
+        # "#b4b4b4").
+        svg = render_widget_svg(
+            self._base_widget(text_color=180), self._config()
+        )
+        assert svg.count('fill="#b4b4b4"') >= 3, (
+            "name, value, and unit text should all use the chosen shade"
+        )
+
+    def test_gauge_without_text_color_keeps_default_colors(self) -> None:
+        # Without text_color, the value stays black and name/unit gray.
+        svg = render_widget_svg(self._base_widget(), self._config())
+        assert 'fill="#000000"' in svg, "value should stay black"
+        assert 'fill="#787878"' in svg, "name/unit should stay gray"
+
     # ── Arc rendering ──────────────────────────────────────────────────
 
     def test_gauge_draws_dark_pixels(self) -> None:

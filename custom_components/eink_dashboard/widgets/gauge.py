@@ -36,6 +36,7 @@ from ._helpers import (
     _color_context,
     _fmt,
     _metrics_context,
+    _text_color_hex,
     _widget_dim,
 )
 
@@ -464,6 +465,9 @@ def _build_gauge_context(
         "bar_width": bar_width,
         "x_off": x_off,
         "r_inset": r_inset,
+        # Optional shade override for name/value/unit text; empty
+        # string means "use the per-element default colors".
+        "text_color": _text_color_hex(widget),
         **_metrics_context(m),
         **_color_context(),
         # Arc geometry.

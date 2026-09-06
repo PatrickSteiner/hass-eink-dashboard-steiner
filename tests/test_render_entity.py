@@ -638,6 +638,40 @@ class TestRenderEntity:
             "name should render in gray"
         )
 
+    def test_entity_text_color_colors_name_value_unit(self) -> None:
+        # text_color overrides the fill of the name, value, and unit
+        # text with the chosen grayscale shade (light gray = 180 →
+        # "#b4b4b4"). The icon keeps its own colors, so exactly the
+        # three text elements pick up the shade.
+        widget = {
+            "type": "entity",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+            "text_color": 180,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('fill="#b4b4b4"') >= 3, (
+            "name, value, and unit text should all use the chosen shade"
+        )
+
+    def test_entity_without_text_color_keeps_default_colors(self) -> None:
+        # Without text_color, value/unit stay black (#000000) and the
+        # name stays gray (#787878) — the pre-existing appearance.
+        widget = {
+            "type": "entity",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'fill="#000000"' in svg, "value/unit should stay black"
+        assert 'fill="#787878"' in svg, "name should stay gray"
+
     def test_entity_value_font_larger_than_name(self) -> None:
         # The state value is the element users scan for at a
         # glance, so it must render in a larger font than the

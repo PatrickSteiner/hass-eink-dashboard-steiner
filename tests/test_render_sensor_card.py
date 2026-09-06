@@ -207,6 +207,38 @@ class TestRenderSensor:
         without = render_dashboard([base], self._config())
         assert with_none == without
 
+    def test_sensor_text_color_colors_name_value_unit(self) -> None:
+        # text_color overrides the fill of the header name, value, and
+        # unit text with the chosen grayscale shade (light gray = 180
+        # → "#b4b4b4").
+        widget = {
+            "type": "sensor",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+            "text_color": 180,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('fill="#b4b4b4"') >= 3, (
+            "name, value, and unit text should all use the chosen shade"
+        )
+
+    def test_sensor_without_text_color_keeps_default_colors(self) -> None:
+        # Without text_color, value stays black and name/unit stay gray.
+        widget = {
+            "type": "sensor",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'fill="#000000"' in svg, "value should stay black"
+        assert 'fill="#787878"' in svg, "name/unit should stay gray"
+
     # ── Icon style tests ──────────────────────────────
     # Use h=224 so the header section (40% = ~90px) gives an icon
     # circle large enough to reliably sample the ring region.

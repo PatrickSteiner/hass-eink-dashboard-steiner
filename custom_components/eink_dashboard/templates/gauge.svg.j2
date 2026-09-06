@@ -60,7 +60,7 @@
   font-weight="{{ 'bold' if value_bold else '500' }}"
   text-anchor="middle"
   dominant-baseline="central"
-  fill="{{ hex_black }}">{{ formatted_val }}</text>
+  fill="{{ text_color or hex_black }}">{{ formatted_val }}</text>
 {# Unit: smaller text just below the value glyph baseline. #}
 {%- if unit_text -%}
 <text
@@ -69,7 +69,7 @@
   font-size="{{ unit_font_sz }}"
   text-anchor="middle"
   dominant-baseline="hanging"
-  fill="{{ hex_gray }}">{{ unit_text }}</text>
+  fill="{{ text_color or hex_gray }}">{{ unit_text }}</text>
 {%- endif -%}
 {# Segment label: describes the matching value range. #}
 {%- if segment_label -%}
@@ -88,7 +88,7 @@
   font-size="{{ name_font_sz }}"
   text-anchor="middle"
   dominant-baseline="central"
-  fill="{{ hex_gray }}">{{ name_text }}</text>
+  fill="{{ text_color or hex_gray }}">{{ name_text }}</text>
 {%- endcall -%}
 {%- endif -%}
 </svg>

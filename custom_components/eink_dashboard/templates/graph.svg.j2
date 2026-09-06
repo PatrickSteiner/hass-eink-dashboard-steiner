@@ -53,7 +53,7 @@
   font-weight="500"
   font-size="{{ name_font_sz }}"
   dominant-baseline="central"
-  fill="{{ hex_gray }}">{{ name_text }}</text>
+  fill="{{ text_color or hex_gray }}">{{ name_text }}</text>
 {%- endif -%}
 {%- if not hide_state -%}
 <text
@@ -64,14 +64,14 @@
 {%- endif %}
   font-size="{{ value_font_sz }}"
   dominant-baseline="central"
-  fill="{{ hex_black }}">{{ value_text }}</text>
+  fill="{{ text_color or hex_black }}">{{ value_text }}</text>
 {%- if unit_text -%}
 <text
   x="{{ unit_x }}" y="{{ unit_y }}"
   font-family="Roboto"
   font-size="{{ unit_font_sz }}"
   dominant-baseline="central"
-  fill="{{ hex_gray }}">{{ unit_text }}</text>
+  fill="{{ text_color or hex_gray }}">{{ unit_text }}</text>
 {%- endif -%}
 {%- endif -%}
 {#- Graph area: grid, fills, lines, labels, extrema, legend. -#}

@@ -33,6 +33,7 @@ from ._helpers import (
     _metrics_context,
     _resolve_icon_style,
     _resolve_icon_svg,
+    _text_color_hex,
     _title_layout,
     _widget_dim,
 )
@@ -323,4 +324,7 @@ def _build_entities_context(
         "icon_stroke_w": icon_stroke_w,
         "divider_stroke_w": divider_stroke_w,
         "value_bold": value_bold,
+        # Optional shade override for each row's name and value text;
+        # empty string means "use the per-element default colors".
+        "text_color": _text_color_hex(widget),
     }

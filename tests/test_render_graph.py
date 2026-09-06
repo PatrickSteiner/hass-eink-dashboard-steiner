@@ -249,6 +249,24 @@ class TestRenderGraph:
         without = render_dashboard([base], self._config())
         assert with_none == without
 
+    def test_graph_text_color_colors_header_name_value_unit(self) -> None:
+        # text_color overrides the fill of the header name, value, and
+        # unit text with the chosen grayscale shade (light gray = 180
+        # → "#b4b4b4").
+        svg = render_widget_svg(
+            self._base_widget(text_color=180), self._config()
+        )
+        assert svg.count('fill="#b4b4b4"') >= 3, (
+            "header name, value, and unit should all use the chosen shade"
+        )
+
+    def test_graph_without_text_color_keeps_default_colors(self) -> None:
+        # Without text_color, the header value stays black and the
+        # name/unit stay gray.
+        svg = render_widget_svg(self._base_widget(), self._config())
+        assert 'fill="#000000"' in svg, "value should stay black"
+        assert 'fill="#787878"' in svg, "name/unit should stay gray"
+
     # ── SVG content tests (Phase 1 — explicit smoothing=False) ────────
 
     def test_graph_has_polyline(self) -> None:

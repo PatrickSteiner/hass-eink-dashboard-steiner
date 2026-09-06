@@ -30,7 +30,7 @@
   font-weight="500"
   font-size="{{ name_font_sz }}"
   dominant-baseline="central"
-  fill="{{ hex_gray }}">{{ name_text }}</text>
+  fill="{{ text_color or hex_gray }}">{{ name_text }}</text>
 {%- endif -%}
 {#- Info section: large value with optional unit beside it. -#}
 {%- if not hide_state -%}
@@ -42,14 +42,14 @@
 {%- endif %}
   font-size="{{ value_font_sz }}"
   dominant-baseline="auto"
-  fill="{{ hex_black }}">{{ value_text }}</text>
+  fill="{{ text_color or hex_black }}">{{ value_text }}</text>
 {%- if unit_text -%}
 <text
   x="{{ unit_x }}" y="{{ unit_y }}"
   font-family="Roboto"
   font-size="{{ unit_font_sz }}"
   dominant-baseline="auto"
-  fill="{{ hex_gray }}">{{ unit_text }}</text>
+  fill="{{ text_color or hex_gray }}">{{ unit_text }}</text>
 {%- endif -%}
 {%- endif -%}
 {#- Graph section: sparkline history chart below the info section. -#}

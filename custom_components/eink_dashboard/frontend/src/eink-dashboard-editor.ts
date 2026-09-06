@@ -511,6 +511,40 @@ function colorSelector(defaultColor: number = 0): HaFormSchema {
 }
 
 /**
+ * Color options for the text_color field, prefixed with an "Auto"
+ * entry whose empty value leaves each text element at its built-in
+ * color.
+ */
+const TEXT_COLOR_OPTIONS = [
+  { value: "", label: "Auto (default)" },
+  ...COLOR_OPTIONS,
+];
+
+/**
+ * Text color dropdown for an entity widget's name/value/unit text.
+ *
+ * Defaults to "" (Auto), which preserves each element's built-in
+ * color (name gray, value black). Any grayscale 0–255 value
+ * overrides the name, value, and unit text with that single shade.
+ * ``custom_value`` allows entering an exact shade not in the list.
+ *
+ * @returns A single ha-form schema entry named ``text_color``.
+ */
+function textColorSelector(): HaFormSchema {
+  return {
+    name: "text_color",
+    default: "",
+    selector: {
+      select: {
+        options: TEXT_COLOR_OPTIONS,
+        mode: "dropdown",
+        custom_value: true,
+      },
+    },
+  };
+}
+
+/**
  * Common "Identity" section prepended to every widget's
  * form schema.
  *
@@ -785,7 +819,12 @@ export const SCHEMAS: Record<
       flatten: true,
       title: "Appearance",
       icon: "mdi:palette",
-      schema: [cardStyleSelector(), iconStyleSelector(), boldValueSelector()],
+      schema: [
+        cardStyleSelector(),
+        iconStyleSelector(),
+        boldValueSelector(),
+        textColorSelector(),
+      ],
     },
   ],
 
@@ -840,6 +879,7 @@ export const SCHEMAS: Record<
         boldValueSelector(),
         namePositionSelector(),
         nameAlignSelector(),
+        textColorSelector(),
       ],
     },
   ],
@@ -875,7 +915,12 @@ export const SCHEMAS: Record<
       flatten: true,
       title: "Appearance",
       icon: "mdi:palette",
-      schema: [cardStyleSelector(), iconStyleSelector(), boldValueSelector()],
+      schema: [
+        cardStyleSelector(),
+        iconStyleSelector(),
+        boldValueSelector(),
+        textColorSelector(),
+      ],
     },
   ],
 
@@ -1081,7 +1126,12 @@ export const SCHEMAS: Record<
       flatten: true,
       title: "Appearance",
       icon: "mdi:palette",
-      schema: [cardStyleSelector(), iconStyleSelector(), boldValueSelector()],
+      schema: [
+        cardStyleSelector(),
+        iconStyleSelector(),
+        boldValueSelector(),
+        textColorSelector(),
+      ],
     },
   ],
 
@@ -1282,7 +1332,11 @@ export const SCHEMAS: Record<
       flatten: true,
       title: "Appearance",
       icon: "mdi:palette",
-      schema: [cardStyleSelector(), boldValueSelector()],
+      schema: [
+        cardStyleSelector(),
+        boldValueSelector(),
+        textColorSelector(),
+      ],
     },
   ],
   graph: (d) => [
@@ -1573,7 +1627,11 @@ export const SCHEMAS: Record<
       flatten: true,
       title: "Appearance",
       icon: "mdi:palette",
-      schema: [cardStyleSelector(), boldValueSelector()],
+      schema: [
+        cardStyleSelector(),
+        boldValueSelector(),
+        textColorSelector(),
+      ],
     },
   ],
 };
@@ -1612,6 +1670,7 @@ export const LABELS: Record<string, string> = {
   card_style: "Card style",
   icon_style: "Icon style",
   bold_value: "Bold value",
+  text_color: "Text color",
   layout: "Layout",
   show_all: "Show all upcoming dates",
   entries: "Entries",
