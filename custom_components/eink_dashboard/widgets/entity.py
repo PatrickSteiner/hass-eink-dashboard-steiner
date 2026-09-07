@@ -35,9 +35,11 @@ from ._helpers import (
     _card_insets,
     _color_context,
     _fmt,
+    _font_size_override,
     _metrics_context,
     _resolve_icon_style,
     _resolve_icon_svg,
+    _style_is_bold,
     _text_color_hex,
     _widget_dim,
 )
@@ -120,7 +122,13 @@ def _build_entity_context(
     hide_name: bool = widget.get("hide_name", False)
     icon_style = widget.get("icon_style")
     card_style = widget.get("card_style", DEFAULT_CARD_STYLE)
-    value_bold: bool = widget.get("bold_value", False)
+    # Per-element bold: value_style supersedes the legacy bold_value
+    # toggle; name and unit have no legacy control.
+    value_bold: bool = _style_is_bold(
+        widget, "value_style", legacy_bold_key="bold_value"
+    )
+    name_bold: bool = _style_is_bold(widget, "name_style")
+    unit_bold: bool = _style_is_bold(widget, "unit_style")
     name_position = widget.get("name_position", "bottom")
     name_align = widget.get("name_align", "left")
     states = config.get("states", {})
@@ -239,6 +247,14 @@ def _build_entity_context(
     value_font_sz = max(10, round(row_ref * 0.42))
     unit_font_sz = max(10, round(row_ref * 0.22))
     name_font_sz = max(10, round(row_ref * 0.20))
+    # Apply optional absolute per-element font-size overrides before the
+    # layout math below, so the value-width measurement (which places
+    # the unit) uses the overridden size.
+    value_font_sz = _font_size_override(
+        widget, "value_font_size", value_font_sz
+    )
+    unit_font_sz = _font_size_override(widget, "unit_font_size", unit_font_sz)
+    name_font_sz = _font_size_override(widget, "name_font_size", name_font_sz)
 
     # Value and name are stacked tightly (small line gap, mirroring
     # card_row's primary/secondary spacing) and the whole two-line
@@ -310,6 +326,7 @@ def _build_entity_context(
         "unit_x": unit_x,
         "unit_y": unit_y,
         "unit_font_sz": unit_font_sz,
+        "unit_bold": unit_bold,
         # Name.
         "hide_name": hide_name,
         "name_text": name_text,
@@ -317,4 +334,5 @@ def _build_entity_context(
         "name_y": name_y,
         "name_font_sz": name_font_sz,
         "name_anchor": name_anchor,
+        "name_bold": name_bold,
     }

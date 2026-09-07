@@ -50,7 +50,7 @@
 <text
   x="{{ name_x }}" y="{{ name_y }}"
   font-family="Roboto"
-  font-weight="500"
+  font-weight="{{ 'bold' if name_bold else '500' }}"
   font-size="{{ name_font_sz }}"
   dominant-baseline="central"
   fill="{{ text_color or hex_gray }}">{{ name_text }}</text>
@@ -69,6 +69,9 @@
 <text
   x="{{ unit_x }}" y="{{ unit_y }}"
   font-family="Roboto"
+{%- if unit_bold %}
+  font-weight="bold"
+{%- endif %}
   font-size="{{ unit_font_sz }}"
   dominant-baseline="central"
   fill="{{ text_color or hex_gray }}">{{ unit_text }}</text>

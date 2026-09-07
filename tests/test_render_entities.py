@@ -95,6 +95,41 @@ class TestRenderEntities:
     def _config(self, **overrides: object) -> dict[str, object]:
         return make_config(self._DEFAULTS, **overrides)
 
+    def test_entities_per_element_font_size_overrides(self) -> None:
+        # name_font_size / value_font_size set the exact px font-size
+        # of each row's name and value text.
+        widget = {
+            "type": "entities",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entities": ["sensor.temperature"],
+            "name_font_size": 30,
+            "value_font_size": 60,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'font-size="30"' in svg, "name should use the override size"
+        assert 'font-size="60"' in svg, "value should use the override size"
+
+    def test_entities_per_element_style_bold(self) -> None:
+        # name_style/value_style="bold" render each row's name and
+        # value bold.
+        widget = {
+            "type": "entities",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entities": ["sensor.temperature"],
+            "name_style": "bold",
+            "value_style": "bold",
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('font-weight="bold"') >= 2, (
+            "row name and value should both render bold"
+        )
+
     def test_entities_text_color_colors_row_name_and_value(self) -> None:
         # text_color overrides the fill of each row's name and value
         # text with the chosen grayscale shade (light gray = 180 →

@@ -66,6 +66,9 @@
 <text
   x="{{ unit_x }}" y="{{ unit_y }}"
   font-family="Roboto"
+{%- if unit_bold %}
+  font-weight="bold"
+{%- endif %}
   font-size="{{ unit_font_sz }}"
   text-anchor="middle"
   dominant-baseline="hanging"
@@ -85,6 +88,9 @@
 <text
   x="{{ name_x }}" y="{{ name_y }}"
   font-family="Roboto"
+{%- if name_bold %}
+  font-weight="bold"
+{%- endif %}
   font-size="{{ name_font_sz }}"
   text-anchor="middle"
   dominant-baseline="central"

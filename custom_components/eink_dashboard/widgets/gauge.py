@@ -35,7 +35,9 @@ from ._helpers import (
     _card_insets,
     _color_context,
     _fmt,
+    _font_size_override,
     _metrics_context,
+    _style_is_bold,
     _text_color_hex,
     _widget_dim,
 )
@@ -235,7 +237,13 @@ def _build_gauge_context(
     show_unit: bool = bool(widget.get("show_unit", True))
     decimals = widget.get("decimals")
     attribute: str | None = widget.get("attribute")
-    value_bold: bool = widget.get("bold_value", False)
+    # Per-element bold: value_style supersedes the legacy bold_value
+    # toggle; name and unit have no legacy control.
+    value_bold: bool = _style_is_bold(
+        widget, "value_style", legacy_bold_key="bold_value"
+    )
+    name_bold: bool = _style_is_bold(widget, "name_style")
+    unit_bold: bool = _style_is_bold(widget, "unit_style")
 
     # Missing entity → blank white canvas.
     state = states.get(entity_id) if entity_id else None
@@ -290,7 +298,9 @@ def _build_gauge_context(
 
     # --- Gauge geometry ---
     # Name label: height proportional to the total widget height.
-    name_font_sz = max(10, round(h * 0.07))
+    name_font_sz = _font_size_override(
+        widget, "name_font_size", max(10, round(h * 0.07))
+    )
     name_h = round(name_font_sz * 1.8)
 
     # Content area width after horizontal card insets.
@@ -438,12 +448,16 @@ def _build_gauge_context(
 
     # --- Text layout ---
     # Value: large text centred at the arc centre.
-    value_font_sz = max(12, round(radius * 0.45))
+    value_font_sz = _font_size_override(
+        widget, "value_font_size", max(12, round(radius * 0.45))
+    )
     value_x = cx
     value_y = cy
 
     # Unit: smaller text, baseline below the value glyph.
-    unit_font_sz = max(10, round(radius * 0.22))
+    unit_font_sz = _font_size_override(
+        widget, "unit_font_size", max(10, round(radius * 0.22))
+    )
     unit_y = cy + value_font_sz // 2 + 4
 
     # Segment label: below the unit.
@@ -497,6 +511,7 @@ def _build_gauge_context(
         "unit_x": cx,
         "unit_y": unit_y,
         "unit_font_sz": unit_font_sz,
+        "unit_bold": unit_bold,
         # Segment label.
         "segment_label": segment_label,
         "seg_label_x": cx,
@@ -512,4 +527,5 @@ def _build_gauge_context(
         "name_x": cx,
         "name_y": name_y,
         "name_font_sz": name_font_sz,
+        "name_bold": name_bold,
     }

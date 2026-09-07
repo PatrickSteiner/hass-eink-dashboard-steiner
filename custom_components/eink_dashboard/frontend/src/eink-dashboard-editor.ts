@@ -544,6 +544,75 @@ function textColorSelector(): HaFormSchema {
   };
 }
 
+/** Options for a per-element text style dropdown (Normal / Bold). */
+const STYLE_OPTIONS = [
+  { value: "normal", label: "Normal" },
+  { value: "bold", label: "Bold" },
+];
+
+/**
+ * Absolute font-size override selector for one text element.
+ *
+ * Leaving it empty keeps the widget's proportional auto-size; a value
+ * sets that element's font size in pixels.
+ *
+ * @param name - Field key (e.g. `"value_font_size"`).
+ * @returns A number ha-form schema entry.
+ */
+function fontSizeOverrideSelector(name: string): HaFormSchema {
+  return {
+    name,
+    selector: { number: { min: 6, max: 200, step: 1, mode: "box" } },
+  };
+}
+
+/**
+ * Normal/Bold style dropdown for one text element.
+ *
+ * For the value element the key is `value_style`, which supersedes the
+ * legacy `bold_value` toggle (seeded from it at edit time).
+ *
+ * @param name - Field key (e.g. `"name_style"`).
+ * @returns A select ha-form schema entry defaulting to `"normal"`.
+ */
+function styleSelector(name: string): HaFormSchema {
+  return {
+    name,
+    default: "normal",
+    selector: { select: { options: STYLE_OPTIONS, mode: "dropdown" } },
+  };
+}
+
+/**
+ * Grouped "Text size & style" section with per-element font-size and
+ * Normal/Bold style controls for the name, value, and (optionally)
+ * unit text.
+ *
+ * @param includeUnit - When true, adds unit size + style fields
+ *   (widgets whose value already embeds the unit pass `false`).
+ * @returns An expandable ha-form section.
+ */
+function textStyleSection(includeUnit: boolean = true): HaFormSchema {
+  const schema: HaFormSchema[] = [
+    fontSizeOverrideSelector("name_font_size"),
+    styleSelector("name_style"),
+    fontSizeOverrideSelector("value_font_size"),
+    styleSelector("value_style"),
+  ];
+  if (includeUnit) {
+    schema.push(fontSizeOverrideSelector("unit_font_size"));
+    schema.push(styleSelector("unit_style"));
+  }
+  return {
+    name: "text_style",
+    type: "expandable",
+    flatten: true,
+    title: "Text size & style",
+    icon: "mdi:format-size",
+    schema,
+  };
+}
+
 /**
  * Common "Identity" section prepended to every widget's
  * form schema.
@@ -822,8 +891,8 @@ export const SCHEMAS: Record<
       schema: [
         cardStyleSelector(),
         iconStyleSelector(),
-        boldValueSelector(),
         textColorSelector(),
+        textStyleSection(false),
       ],
     },
   ],
@@ -876,10 +945,10 @@ export const SCHEMAS: Record<
       schema: [
         cardStyleSelector(),
         iconStyleSelector(),
-        boldValueSelector(),
         namePositionSelector(),
         nameAlignSelector(),
         textColorSelector(),
+        textStyleSection(),
       ],
     },
   ],
@@ -918,8 +987,8 @@ export const SCHEMAS: Record<
       schema: [
         cardStyleSelector(),
         iconStyleSelector(),
-        boldValueSelector(),
         textColorSelector(),
+        textStyleSection(false),
       ],
     },
   ],
@@ -1129,8 +1198,8 @@ export const SCHEMAS: Record<
       schema: [
         cardStyleSelector(),
         iconStyleSelector(),
-        boldValueSelector(),
         textColorSelector(),
+        textStyleSection(),
       ],
     },
   ],
@@ -1334,8 +1403,8 @@ export const SCHEMAS: Record<
       icon: "mdi:palette",
       schema: [
         cardStyleSelector(),
-        boldValueSelector(),
         textColorSelector(),
+        textStyleSection(),
       ],
     },
   ],
@@ -1629,8 +1698,8 @@ export const SCHEMAS: Record<
       icon: "mdi:palette",
       schema: [
         cardStyleSelector(),
-        boldValueSelector(),
         textColorSelector(),
+        textStyleSection(),
       ],
     },
   ],
@@ -1671,6 +1740,13 @@ export const LABELS: Record<string, string> = {
   icon_style: "Icon style",
   bold_value: "Bold value",
   text_color: "Text color",
+  text_style: "Text size & style",
+  name_font_size: "Name size",
+  name_style: "Name style",
+  value_font_size: "Value size",
+  value_style: "Value style",
+  unit_font_size: "Unit size",
+  unit_style: "Unit style",
   layout: "Layout",
   show_all: "Show all upcoming dates",
   entries: "Entries",
@@ -2388,6 +2464,13 @@ class EinkDashboardEditor extends HTMLElement {
     const formData: Record<string, unknown> = { ...widget };
     if ("color" in formData && formData.color !== undefined) {
       formData.color = String(formData.color);
+    }
+    // Seed the value style from the legacy bold_value toggle so a
+    // previously-bold value shows as "Bold" in the new style dropdown.
+    // Saving then carries value_style forward (bold_value is dropped
+    // by the schema-driven spread), completing the migration.
+    if (formData.value_style === undefined && formData.bold_value) {
+      formData.value_style = "bold";
     }
 
     const form =

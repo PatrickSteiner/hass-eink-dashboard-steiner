@@ -207,6 +207,8 @@
     rpad      -- right padding override; -1 (default) uses padding
     font_value -- font size for the right-aligned value; none
                  (default) falls back to font_secondary
+    primary_bold   -- when true, primary text renders
+                      font-weight="bold" instead of 500
     secondary_bold -- when true, secondary text renders
                       font-weight="bold"
     value_bold     -- when true, the right-aligned value text
@@ -226,6 +228,7 @@
     letter="",
     lpad=-1, rpad=-1,
     font_value=none,
+    primary_bold=false,
     secondary_bold=false,
     value_bold=false
 ) -%}
@@ -264,7 +267,7 @@
 {%- set sy = bt + font_primary + lg + font_secondary // 2 -%}
 <text
   x="{{ tx }}" y="{{ py }}"
-  font-family="Roboto" font-weight="500"
+  font-family="Roboto" font-weight="{{ 'bold' if primary_bold else '500' }}"
   font-size="{{ font_primary }}"
   dominant-baseline="central"
   fill="{{ primary_fill }}">{{ primary }}</text>
@@ -283,7 +286,7 @@
    (bb[1]).  The difference is a few pixels and acceptable for e-ink. #}
 <text
   x="{{ tx }}" y="{{ y + row_h // 2 }}"
-  font-family="Roboto" font-weight="500"
+  font-family="Roboto" font-weight="{{ 'bold' if primary_bold else '500' }}"
   font-size="{{ font_primary }}"
   dominant-baseline="central"
   fill="{{ primary_fill }}">{{ primary }}</text>

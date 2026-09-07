@@ -267,6 +267,32 @@ class TestRenderGraph:
         assert 'fill="#000000"' in svg, "value should stay black"
         assert 'fill="#787878"' in svg, "name/unit should stay gray"
 
+    def test_graph_per_element_font_size_overrides(self) -> None:
+        # name_font_size / value_font_size / unit_font_size set the
+        # exact px font-size of each header text element.
+        svg = render_widget_svg(
+            self._base_widget(
+                name_font_size=30, value_font_size=60, unit_font_size=25
+            ),
+            self._config(),
+        )
+        assert 'font-size="30"' in svg, "name should use the override size"
+        assert 'font-size="60"' in svg, "value should use the override size"
+        assert 'font-size="25"' in svg, "unit should use the override size"
+
+    def test_graph_per_element_style_bold(self) -> None:
+        # name_style/value_style/unit_style="bold" render each header
+        # text element bold.
+        svg = render_widget_svg(
+            self._base_widget(
+                name_style="bold", value_style="bold", unit_style="bold"
+            ),
+            self._config(),
+        )
+        assert svg.count('font-weight="bold"') >= 3, (
+            "header name, value, and unit should all render bold"
+        )
+
     # ── SVG content tests (Phase 1 — explicit smoothing=False) ────────
 
     def test_graph_has_polyline(self) -> None:

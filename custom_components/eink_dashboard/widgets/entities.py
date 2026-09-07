@@ -30,9 +30,11 @@ from ._helpers import (
     _card_insets,
     _color_context,
     _fmt,
+    _font_size_override,
     _metrics_context,
     _resolve_icon_style,
     _resolve_icon_svg,
+    _style_is_bold,
     _text_color_hex,
     _title_layout,
     _widget_dim,
@@ -104,7 +106,12 @@ def _build_entities_context(
     title: str = widget.get("title", "")
     icon_style = widget.get("icon_style")
     card_style = widget.get("card_style", DEFAULT_CARD_STYLE)
-    value_bold: bool = widget.get("bold_value", False)
+    # Per-element bold: value_style supersedes the legacy bold_value
+    # toggle; name has no legacy control.
+    value_bold: bool = _style_is_bold(
+        widget, "value_style", legacy_bold_key="bold_value"
+    )
+    name_bold: bool = _style_is_bold(widget, "name_style")
     entity_configs: list = widget.get("entities", [])
     states = config.get("states", {})
     display_levels = config.get("display_levels", 16)
@@ -324,6 +331,16 @@ def _build_entities_context(
         "icon_stroke_w": icon_stroke_w,
         "divider_stroke_w": divider_stroke_w,
         "value_bold": value_bold,
+        "name_bold": name_bold,
+        # Per-element absolute font-size overrides for each row's name
+        # (default: the metrics' secondary size) and value (default:
+        # the primary size), matching the template's font wiring.
+        "name_font_sz": _font_size_override(
+            widget, "name_font_size", m.font_secondary
+        ),
+        "value_font_sz": _font_size_override(
+            widget, "value_font_size", m.font_primary
+        ),
         # Optional shade override for each row's name and value text;
         # empty string means "use the per-element default colors".
         "text_color": _text_color_hex(widget),

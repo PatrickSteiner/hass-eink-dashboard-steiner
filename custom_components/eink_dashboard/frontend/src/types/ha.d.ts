@@ -534,6 +534,20 @@ export interface TileWidget extends WidgetBase {
    * color — name gray, value black.
    */
   text_color?: number;
+  /** Absolute font size (px) for the name text; omit for auto-size. */
+  name_font_size?: number;
+  /** Name text style. */
+  name_style?: "normal" | "bold";
+  /**
+   * Absolute font size (px) for the state-value text; omit for
+   * auto-size.
+   */
+  value_font_size?: number;
+  /**
+   * State-value text style. Supersedes the legacy `bold_value`
+   * toggle when present.
+   */
+  value_style?: "normal" | "bold";
   /**
    * HA conditions that trigger inverted rendering (black card,
    * white text) as an e-ink attention signal. Same condition
@@ -673,6 +687,23 @@ export interface EntitiesWidget extends WidgetBase {
    * gray, value black.
    */
   text_color?: number;
+  /**
+   * Absolute font size (px) for every row's name text; omit for
+   * auto-size.
+   */
+  name_font_size?: number;
+  /** Row name text style. */
+  name_style?: "normal" | "bold";
+  /**
+   * Absolute font size (px) for every row's value text; omit for
+   * auto-size.
+   */
+  value_font_size?: number;
+  /**
+   * Row value text style. Supersedes the legacy `bold_value` toggle
+   * when present.
+   */
+  value_style?: "normal" | "bold";
 }
 
 /**
@@ -716,6 +747,21 @@ export interface EntityWidget extends WidgetBase {
    * color — name gray, value black.
    */
   text_color?: number;
+  /** Absolute font size (px) for the name text; omit for auto-size. */
+  name_font_size?: number;
+  /** Name text style. */
+  name_style?: "normal" | "bold";
+  /** Absolute font size (px) for the value text; omit for auto-size. */
+  value_font_size?: number;
+  /**
+   * Value text style. Supersedes the legacy `bold_value` toggle when
+   * present.
+   */
+  value_style?: "normal" | "bold";
+  /** Absolute font size (px) for the unit text; omit for auto-size. */
+  unit_font_size?: number;
+  /** Unit text style. */
+  unit_style?: "normal" | "bold";
   /**
    * Position of the name relative to the value+unit line.
    * Defaults to `"bottom"`.
@@ -812,6 +858,21 @@ export interface SensorWidget extends WidgetBase {
    * color — name gray, value black.
    */
   text_color?: number;
+  /** Absolute font size (px) for the name text; omit for auto-size. */
+  name_font_size?: number;
+  /** Name text style. */
+  name_style?: "normal" | "bold";
+  /** Absolute font size (px) for the value text; omit for auto-size. */
+  value_font_size?: number;
+  /**
+   * Value text style. Supersedes the legacy `bold_value` toggle when
+   * present.
+   */
+  value_style?: "normal" | "bold";
+  /** Absolute font size (px) for the unit text; omit for auto-size. */
+  unit_font_size?: number;
+  /** Unit text style. */
+  unit_style?: "normal" | "bold";
 }
 
 /** One threshold-based color band on the gauge track. */
@@ -903,6 +964,21 @@ export interface GaugeWidget extends WidgetBase {
    * color — name gray, value black.
    */
   text_color?: number;
+  /** Absolute font size (px) for the name text; omit for auto-size. */
+  name_font_size?: number;
+  /** Name text style. */
+  name_style?: "normal" | "bold";
+  /** Absolute font size (px) for the value text; omit for auto-size. */
+  value_font_size?: number;
+  /**
+   * Value text style. Supersedes the legacy `bold_value` toggle when
+   * present.
+   */
+  value_style?: "normal" | "bold";
+  /** Absolute font size (px) for the unit text; omit for auto-size. */
+  unit_font_size?: number;
+  /** Unit text style. */
+  unit_style?: "normal" | "bold";
 }
 
 /**
@@ -1247,6 +1323,21 @@ export interface GraphWidget extends WidgetBase {
    * default color — name gray, value black.
    */
   text_color?: number;
+  /** Absolute font size (px) for the name text; omit for auto-size. */
+  name_font_size?: number;
+  /** Name text style. */
+  name_style?: "normal" | "bold";
+  /** Absolute font size (px) for the value text; omit for auto-size. */
+  value_font_size?: number;
+  /**
+   * Value text style. Supersedes the legacy `bold_value` toggle when
+   * present.
+   */
+  value_style?: "normal" | "bold";
+  /** Absolute font size (px) for the unit text; omit for auto-size. */
+  unit_font_size?: number;
+  /** Unit text style. */
+  unit_style?: "normal" | "bold";
 }
 
 export type Widget =

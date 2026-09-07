@@ -38,6 +38,7 @@ from ._helpers import (
     _color_context,
     _entity_info_context,
     _fmt,
+    _font_size_override,
     _widget_dim,
 )
 
@@ -639,12 +640,24 @@ def _fix_header_layout(
     value_unit_font_sz = (
         state_font_sz if state_font_sz is not None else m_hdr.font_secondary
     )
+    # Absolute per-element font-size overrides win over the derived
+    # sizes (and, for value/unit, over state_font_size).
+    name_font_sz = _font_size_override(
+        widget, "name_font_size", m_hdr.font_primary
+    )
+    value_font_sz = _font_size_override(
+        widget, "value_font_size", value_unit_font_sz
+    )
+    unit_font_sz = _font_size_override(
+        widget, "unit_font_size", value_unit_font_sz
+    )
+    name_bold = bool(ctx.get("name_bold", False))
 
-    ctx["name_font_sz"] = m_hdr.font_primary
+    ctx["name_font_sz"] = name_font_sz
     ctx["name_y"] = header_h // 2
-    ctx["value_font_sz"] = value_unit_font_sz
+    ctx["value_font_sz"] = value_font_sz
     ctx["value_y"] = header_h // 2
-    ctx["unit_font_sz"] = value_unit_font_sz
+    ctx["unit_font_sz"] = unit_font_sz
     ctx["unit_y"] = header_h // 2
 
     # When the name is shown, value_x must be shifted right past the
@@ -652,7 +665,7 @@ def _fix_header_layout(
     show_name = bool(widget.get("show_name", True))
     name_text_str = str(ctx.get("name_text", ""))
     if show_name and name_text_str:
-        nf = _load_font(m_hdr.font_primary, medium=True)
+        nf = _load_font(name_font_sz, medium=not name_bold, bold=name_bold)
         name_w = round(nf.getlength(name_text_str))
         ctx["value_x"] = cast("int", ctx["name_x"]) + name_w + m_hdr.inner_gap
 
@@ -679,7 +692,7 @@ def _fix_header_layout(
     unit_text_str = str(ctx.get("unit_text", ""))
     value_x = cast("int", ctx["value_x"])
     value_bold = bool(ctx["value_bold"])
-    vf = _load_font(value_unit_font_sz, medium=not value_bold, bold=value_bold)
+    vf = _load_font(value_font_sz, medium=not value_bold, bold=value_bold)
     if value_text_str:
         value_text_str = _truncate_to_width(
             value_text_str, vf, max(0, right_bound - value_x)

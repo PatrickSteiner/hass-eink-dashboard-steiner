@@ -672,6 +672,63 @@ class TestRenderEntity:
         assert 'fill="#000000"' in svg, "value/unit should stay black"
         assert 'fill="#787878"' in svg, "name should stay gray"
 
+    def test_entity_per_element_font_size_overrides(self) -> None:
+        # name_font_size / value_font_size / unit_font_size set the
+        # exact px font-size of each text element, overriding the
+        # proportional auto-size (defaults at h=112 are ~11/24/12).
+        widget = {
+            "type": "entity",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+            "name_font_size": 20,
+            "value_font_size": 40,
+            "unit_font_size": 16,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'font-size="20"' in svg, "name should use the override size"
+        assert 'font-size="40"' in svg, "value should use the override size"
+        assert 'font-size="16"' in svg, "unit should use the override size"
+
+    def test_entity_per_element_style_bold(self) -> None:
+        # name_style/value_style/unit_style="bold" render each of the
+        # three text elements with a bold font-weight.
+        widget = {
+            "type": "entity",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+            "name_style": "bold",
+            "value_style": "bold",
+            "unit_style": "bold",
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('font-weight="bold"') >= 3, (
+            "name, value, and unit should all render bold"
+        )
+
+    def test_entity_value_style_supersedes_bold_value(self) -> None:
+        # An explicit value_style="normal" wins over the legacy
+        # bold_value=True, so nothing renders bold.
+        widget = {
+            "type": "entity",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 112,
+            "entity": "sensor.temperature",
+            "value_style": "normal",
+            "bold_value": True,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'font-weight="bold"' not in svg, (
+            "explicit value_style=normal should override legacy bold_value"
+        )
+
     def test_entity_value_font_larger_than_name(self) -> None:
         # The state value is the element users scan for at a
         # glance, so it must render in a larger font than the

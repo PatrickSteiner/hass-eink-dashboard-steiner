@@ -156,6 +156,65 @@ def _text_color_hex(widget: Widget) -> str:
         return ""
 
 
+def _font_size_override(widget: Widget, key: str, default: int) -> int:
+    """Return an absolute font-size override, or ``default``.
+
+    Reads the optional ``key`` widget option — an absolute pixel
+    font size that overrides an element's proportional auto-size.
+    Returns ``default`` when the option is absent, empty, non-numeric,
+    or not positive, so a widget keeps its computed size unless a
+    valid override is provided.
+
+    Args:
+        widget: Widget config dict.
+        key: Widget option key (e.g. ``"value_font_size"``).
+        default: Computed proportional size to fall back to.
+
+    Returns:
+        The override size in pixels when valid and > 0, else
+        ``default``.
+    """
+    raw = widget.get(key)
+    if raw is None or raw == "":
+        return default
+    try:
+        size = int(float(raw))
+    except (ValueError, TypeError):
+        return default
+    return size if size > 0 else default
+
+
+def _style_is_bold(
+    widget: Widget,
+    key: str,
+    *,
+    legacy_bold_key: str | None = None,
+) -> bool:
+    """Return whether a per-element text style resolves to bold.
+
+    The style option ``key`` takes values ``"normal"`` or ``"bold"``.
+    When ``key`` is present it is authoritative.  When it is absent
+    and ``legacy_bold_key`` is given, the boolean legacy option is
+    honoured instead so existing configs keep rendering as before
+    (used for the value element, whose legacy control is
+    ``bold_value``).
+
+    Args:
+        widget: Widget config dict.
+        key: Style option key (e.g. ``"name_style"``).
+        legacy_bold_key: Optional legacy boolean key consulted only
+            when ``key`` is absent (e.g. ``"bold_value"``).
+
+    Returns:
+        ``True`` when the element should render bold, else ``False``.
+    """
+    if key in widget and widget.get(key) not in (None, ""):
+        return str(widget.get(key)) == "bold"
+    if legacy_bold_key is not None:
+        return bool(widget.get(legacy_bold_key, False))
+    return False
+
+
 def _fmt(value: str, config: DisplayConfig) -> str:
     """Format a numeric string using the locale settings in ``config``.
 
@@ -442,6 +501,9 @@ def _entity_text_geometry(
     value_text: str,
     unit_text: str,
     value_bold: bool,
+    name_font_sz_override: int | None = None,
+    value_font_sz_override: int | None = None,
+    unit_font_sz_override: int | None = None,
 ) -> EntityTextGeometry:
     """Compute name/value/unit font sizes and positions.
 
@@ -465,6 +527,14 @@ def _entity_text_geometry(
             ``value_x``.
         value_bold: Whether the value is rendered in bold, which
             changes the font used for measuring ``value_text``.
+        name_font_sz_override: Absolute name font size in pixels, or
+            ``None`` to use the proportional default.
+        value_font_sz_override: Absolute value font size in pixels,
+            or ``None`` to use the proportional default.  Applied
+            before the value-width measurement so the unit is placed
+            correctly to the right of the (resized) value.
+        unit_font_sz_override: Absolute unit font size in pixels, or
+            ``None`` to use the default.
 
     Returns:
         ``EntityTextGeometry`` with font sizes and positions for
@@ -472,15 +542,27 @@ def _entity_text_geometry(
     """
     from ..render import _load_font
 
-    name_font_sz = max(10, round(header_h * 0.32))
+    name_font_sz = (
+        name_font_sz_override
+        if name_font_sz_override is not None
+        else max(10, round(header_h * 0.32))
+    )
     name_x = x_off + lpad
     name_y = header_h // 2
 
-    value_font_sz = max(10, round(section_h * 0.38))
+    value_font_sz = (
+        value_font_sz_override
+        if value_font_sz_override is not None
+        else max(10, round(section_h * 0.38))
+    )
     value_x = x_off + lpad
     value_y = header_h + round(info_h * 0.65)
 
-    unit_font_sz = m.font_secondary
+    unit_font_sz = (
+        unit_font_sz_override
+        if unit_font_sz_override is not None
+        else m.font_secondary
+    )
     unit_x = value_x
     if unit_text:
         value_font = _load_font(
@@ -549,7 +631,13 @@ def _entity_info_context(
     hide_name: bool = widget.get("hide_name", False)
     icon_style = widget.get("icon_style")
     card_style = widget.get("card_style", DEFAULT_CARD_STYLE)
-    value_bold: bool = widget.get("bold_value", False)
+    # Per-element bold: value_style supersedes the legacy bold_value
+    # toggle; name and unit have no legacy control.
+    value_bold: bool = _style_is_bold(
+        widget, "value_style", legacy_bold_key="bold_value"
+    )
+    name_bold: bool = _style_is_bold(widget, "name_style")
+    unit_bold: bool = _style_is_bold(widget, "unit_style")
     states = config.get("states", {})
     display_levels = config.get("display_levels", 16)
 
@@ -643,6 +731,11 @@ def _entity_info_context(
     # Name left-aligned in header row, value left-aligned with baseline
     # at ~65% of the info section, unit positioned right of the value.
     # See _entity_text_geometry() for the exact ratios.
+    # Optional absolute per-element font-size overrides (``None`` when
+    # unset, so the geometry falls back to its proportional sizes).
+    name_fs_override = _font_size_override(widget, "name_font_size", -1)
+    value_fs_override = _font_size_override(widget, "value_font_size", -1)
+    unit_fs_override = _font_size_override(widget, "unit_font_size", -1)
     geo = _entity_text_geometry(
         m,
         header_h,
@@ -653,6 +746,15 @@ def _entity_info_context(
         value_text=value_text,
         unit_text=unit_text,
         value_bold=value_bold,
+        name_font_sz_override=(
+            name_fs_override if name_fs_override > 0 else None
+        ),
+        value_font_sz_override=(
+            value_fs_override if value_fs_override > 0 else None
+        ),
+        unit_font_sz_override=(
+            unit_fs_override if unit_fs_override > 0 else None
+        ),
     )
 
     return {
@@ -686,6 +788,7 @@ def _entity_info_context(
         "name_x": geo.name_x,
         "name_y": geo.name_y,
         "name_font_sz": geo.name_font_sz,
+        "name_bold": name_bold,
         # Info section.
         "value_text": value_text,
         "value_x": geo.value_x,
@@ -696,4 +799,5 @@ def _entity_info_context(
         "unit_x": geo.unit_x,
         "unit_y": geo.unit_y,
         "unit_font_sz": geo.unit_font_sz,
+        "unit_bold": unit_bold,
     }

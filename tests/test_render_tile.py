@@ -87,6 +87,41 @@ class TestRenderTile:
     def _config(self, **overrides: object) -> dict[str, object]:
         return make_config(self._DEFAULTS, **overrides)
 
+    def test_tile_per_element_font_size_overrides(self) -> None:
+        # name_font_size / value_font_size set the exact px font-size
+        # of the name and state-value text.
+        widget = {
+            "type": "tile",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entity": "sensor.temperature",
+            "name_font_size": 30,
+            "value_font_size": 22,
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert 'font-size="30"' in svg, "name should use the override size"
+        assert 'font-size="22"' in svg, "value should use the override size"
+
+    def test_tile_per_element_style_bold(self) -> None:
+        # name_style/value_style="bold" render the name and state
+        # value bold.
+        widget = {
+            "type": "tile",
+            "x": 0,
+            "y": 0,
+            "w": 400,
+            "h": 56,
+            "entity": "sensor.temperature",
+            "name_style": "bold",
+            "value_style": "bold",
+        }
+        svg = render_widget_svg(widget, self._config())
+        assert svg.count('font-weight="bold"') >= 2, (
+            "name and state value should both render bold"
+        )
+
     def test_tile_text_color_colors_name_and_value(self) -> None:
         # text_color overrides the fill of the name (primary) and
         # state value (secondary) text with the chosen grayscale

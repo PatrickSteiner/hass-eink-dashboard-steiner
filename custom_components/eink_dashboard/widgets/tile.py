@@ -31,9 +31,11 @@ from ._helpers import (
     _card_insets,
     _color_context,
     _fmt,
+    _font_size_override,
     _metrics_context,
     _resolve_icon_style,
     _resolve_icon_svg,
+    _style_is_bold,
     _text_color_hex,
     _widget_dim,
 )
@@ -107,7 +109,12 @@ def _build_tile_context(
     icon_override = widget.get("icon")
     hide_icon: bool = widget.get("hide_icon", False)
     hide_state: bool = widget.get("hide_state", False)
-    value_bold: bool = widget.get("bold_value", False)
+    # Per-element bold: value_style supersedes the legacy bold_value
+    # toggle; name has no legacy control.
+    value_bold: bool = _style_is_bold(
+        widget, "value_style", legacy_bold_key="bold_value"
+    )
+    name_bold: bool = _style_is_bold(widget, "name_style")
     state_content = widget.get("state_content")
     icon_style = widget.get("icon_style")
     card_style = widget.get("card_style", DEFAULT_CARD_STYLE)
@@ -219,6 +226,15 @@ def _build_tile_context(
         "primary": primary,
         "secondary": secondary,
         "value_bold": value_bold,
+        "name_bold": name_bold,
+        # Per-element absolute font-size overrides: name maps to the
+        # primary text, value to the secondary (state) text.
+        "name_font_sz": _font_size_override(
+            widget, "name_font_size", m.font_primary
+        ),
+        "value_font_sz": _font_size_override(
+            widget, "value_font_size", m.font_secondary
+        ),
         "icon_svg": icon_svg,
         "icon_fill": icon_fill,
         "icon_outline": icon_outline,
